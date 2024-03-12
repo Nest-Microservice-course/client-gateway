@@ -26,5 +26,3 @@ export const envs = {
   productsMicroserviceHost: envVars.PRODUCTS_MICROSERVICE_HOST,
   productsMicroservicePort: envVars.PRODUCTS_MICROSERVICE_PORT
 };
-
-console.log( envs );

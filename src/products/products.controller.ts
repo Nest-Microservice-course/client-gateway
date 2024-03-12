@@ -1,7 +1,7 @@
-import { BadRequestException, Body, Controller, Delete, Get, Inject, Param, Patch, Post, Query } from '@nestjs/common';
+import { Body, Controller, Delete, Get, Inject, Param, Patch, Post, Query } from '@nestjs/common';
 import { PRODUCT_SERVICE } from '../config';
-import { ClientProxy } from '@nestjs/microservices';
-import { firstValueFrom, Observable } from 'rxjs';
+import { ClientProxy, RpcException } from '@nestjs/microservices';
+import { catchError, Observable } from 'rxjs';
 import { PaginationDto } from '../common';
 
 @Controller( 'products' )
@@ -20,12 +20,18 @@ export class ProductsController {
   }
 
   @Get( ':id' )
-  async findProductById( @Param( 'id' ) id: string ) {
-    try {
+  findProductById( @Param( 'id' ) id: string ) {
+    return this.productsClient.send( { cmd: 'find_one_product' }, { id } )
+      .pipe(
+        catchError( error => {
+          throw new RpcException( error );
+        } )
+      );
+    /*try {
       return await firstValueFrom( this.productsClient.send( { cmd: 'find_one_product' }, { id } ) );
     } catch ( error ) {
-      throw new BadRequestException( error );
-    }
+      throw new RpcException( error );
+    }*/
   }
 
   @Delete( ':id' )
